@@ -58,7 +58,7 @@ namespace Hubsson.Hackathon.Arcade.Client.Dotnet.Services
 
                 if (IsValidMove(newHead, gameState))
                 {
-                    freeSpaces[direction] = CountFreeSpacesInArea(newHead, gameState, 3);
+                    freeSpaces[direction] = CountFreeSpacesInArea(newHead, gameState, 1);
                 }
                 else
                 {
