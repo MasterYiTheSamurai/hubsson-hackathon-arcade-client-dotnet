@@ -49,18 +49,47 @@ namespace Hubsson.Hackathon.Arcade.Client.Dotnet.Services
                 Coordinate newHead = Move(head, direction);
                 if (IsValidMove(newHead, gameState))
                 {
-                   // freeSpaces[direction] = CountFreeSpacesInArea(newHead, gameState, 0);
-                    freeSpaces[direction] = CountFreeSpacesInArea(newHead, gameState, 1);
+                    freeSpaces[direction] = CountFreeSpacesInArea(newHead, gameState, 0);
                     straightFreeSpaces[direction] = CountFreeSpacesInLine(newHead, gameState, direction);
+                    if (IsDeadEnd(newHead, gameState))
+                    {
+                        freeSpaces[direction] = int.MinValue;
+                    }
                 }
                 else
                 {
                     freeSpaces[direction] = int.MinValue;
                 }
             }
-           // _matchRepository.lastDirection = freeSpaces.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
             _matchRepository.lastDirection = freeSpaces.Aggregate((l, r) => l.Value > r.Value || (l.Value == r.Value && straightFreeSpaces[l.Key] > straightFreeSpaces[r.Key]) ? l : r).Key;
             return new Domain.Action { direction = _matchRepository.lastDirection.Value, iteration = gameState.iteration };
+        }
+
+        private bool IsDeadEnd(Coordinate coordinate, ClientGameState state)
+        {
+            int freeSpaces = 0;
+
+            foreach (var direction in new List<Direction> { Direction.Up, Direction.Down, Direction.Left, Direction.Right })
+            {
+                Coordinate newCoordinate = Move(coordinate, direction);
+
+                if (IsValidMove(newCoordinate, state))
+                {
+                    freeSpaces++;
+
+                    foreach (var secondDirection in new List<Direction> { Direction.Up, Direction.Down, Direction.Left, Direction.Right })
+                    {
+                        Coordinate secondNewCoordinate = Move(newCoordinate, secondDirection);
+
+                        if (IsValidMove(secondNewCoordinate, state))
+                        {
+                            freeSpaces++;
+                        }
+                    }
+                }
+            }
+
+            return freeSpaces <= 2;
         }
         private int CountFreeSpacesInLine(Coordinate coordinate, ClientGameState state, Direction direction)
         {
@@ -99,6 +128,7 @@ namespace Hubsson.Hackathon.Arcade.Client.Dotnet.Services
             }
             return true;
         }
+
         private int CountFreeSpacesInArea(Coordinate coordinate, ClientGameState state, int radius)
         {
             int freeSpaces = 0;
