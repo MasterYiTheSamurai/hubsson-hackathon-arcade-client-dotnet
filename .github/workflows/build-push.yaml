@@ -7,7 +7,7 @@ on:
 
 env:
   AZURE_CONTAINER_REGISTRY: HubssonHackathon  
-  AZURE_WEBAPP_NAME: arcade-client-1     # Update with your Azure Web App name
+  AZURE_WEBAPP_NAME: 24aa14a6-f89e-4803-b5e6-beb42bf20a91     # Update with your Azure Web App name
 
 jobs:
     build-and-deploy-client:
